@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1F5AA6">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Fantasy Luck Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F3F5F2; --surface:#FFFFFF; --surface-2:#E9EDE8; --ink:#152019; --ink-2:#4A5A50; --ink-3:#7B8A80;
+  --line:#D5DDD6; --accent:#1F5AA6; --accent-ink:#FFFFFF;
+  --cold:#C23B4E; --cold-soft:#F7DCE0; --hot:#1E8A6E; --hot-soft:#D3EFE6; --neutral-dot:#9AA79E;
+  --shadow:0 1px 2px rgba(21,32,25,.06),0 4px 16px rgba(21,32,25,.06);
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --body:"Barlow",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0F1512; --surface:#17201B; --surface-2:#1F2A24; --ink:#E7EEE9; --ink-2:#A9B8AE; --ink-3:#76867B;
+  --line:#2B3831; --accent:#7FAEF0; --accent-ink:#0F1512;
+  --cold:#F07A8A; --cold-soft:#3A2127; --hot:#4FD1A9; --hot-soft:#173328; --neutral-dot:#5F6E64;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0F1512; --surface:#17201B; --surface-2:#1F2A24; --ink:#E7EEE9; --ink-2:#A9B8AE; --ink-3:#76867B;
+  --line:#2B3831; --accent:#7FAEF0; --accent-ink:#0F1512;
+  --cold:#F07A8A; --cold-soft:#3A2127; --hot:#4FD1A9; --hot-soft:#173328; --neutral-dot:#5F6E64;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding:0 16px}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 56px;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:.01em}
+.num,table,.big{font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+/* header */
+header{display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+.brand h1{font-size:clamp(40px,7vw,64px);font-weight:800;line-height:.9;text-transform:uppercase}
+.brand h1 span{color:var(--accent)}
+.lede{max-width:62ch;color:var(--ink-2);margin:6px 0 0}
+.status{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:13px;color:var(--ink-2);text-align:right}
+.status b{font-family:var(--display);font-size:18px;color:var(--ink);letter-spacing:.02em}
+.early{display:inline-block;margin-top:4px;padding:2px 8px;border-radius:999px;background:var(--surface-2);font-size:12px;font-weight:600;color:var(--ink-2)}
+.tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:10px;width:max-content;max-width:100%}
+.tabs button{border:0;background:transparent;padding:8px 18px;border-radius:7px;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:.06em;cursor:pointer;color:var(--ink-2)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+
+/* section heads */
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:14px}
+.sec-head h2{font-size:28px;font-weight:700;text-transform:uppercase}
+.sec-head p{margin:0;color:var(--ink-2);font-size:14px;max-width:60ch}
+
+/* buy / sell */
+.moves{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.col h3{font-size:20px;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.col h3 i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.col .why{margin:0 0 10px;font-size:13px;color:var(--ink-2)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{display:grid;grid-template-columns:1fr auto;gap:2px 10px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s,transform .15s}
+.card:hover{border-color:var(--ink-3);transform:translateY(-1px)}
+.card .nm{font-weight:600;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+.card .tm{font-size:12px;color:var(--ink-3);letter-spacing:.04em}
+.card .big{grid-row:1/3;grid-column:2;font-family:var(--display);font-weight:800;font-size:30px;line-height:1;align-self:center}
+.card .ln{grid-column:1/-1;font-size:12.5px;color:var(--ink-2);margin-top:6px;border-top:1px dashed var(--line);padding-top:6px}
+.card.cold .big{color:var(--cold)} .card.hot .big{color:var(--hot)}
+.empty{color:var(--ink-3);font-size:14px;padding:12px 0}
+
+/* chart */
+.chart-box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;position:relative}
+#scatter{width:100%;height:auto;display:block}
+#scatter text{fill:var(--ink-3);font-size:11px;font-family:var(--body)}
+#scatter .axis-t{fill:var(--ink-2);font-size:12px;font-weight:600}
+#scatter .grid{stroke:var(--line);stroke-width:1}
+#scatter .par{stroke:var(--ink-3);stroke-dasharray:4 4;stroke-width:1.2}
+#scatter .band-l{fill:var(--hot);fill-opacity:.05} #scatter .band-u{fill:var(--cold);fill-opacity:.05}
+#scatter circle{cursor:pointer;stroke:var(--surface);stroke-width:1.2}
+#scatter circle:hover,#scatter circle.hl{stroke:var(--ink);stroke-width:2}
+#scatter .lbl{fill:var(--ink);font-weight:600;font-size:11.5px;pointer-events:none}
+#scatter .zone{font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12.5px;padding:7px 10px;border-radius:7px;line-height:1.35;white-space:nowrap;box-shadow:var(--shadow)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--ink-2);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%}
+
+/* table */
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:10px}
+.search{flex:1 1 220px;max-width:320px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2);cursor:pointer}
+.toggle input{accent-color:var(--accent);width:16px;height:16px}
+.count{font-size:13px;color:var(--ink-3);margin-left:auto}
+.tbl-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:820px}
+th,td{padding:9px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--surface);z-index:1}
+thead th{font-family:var(--display);font-weight:700;font-size:13.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);cursor:pointer;user-select:none;background:var(--surface)}
+thead th[aria-sort] {color:var(--ink)}
+thead th[aria-sort="ascending"]::after{content:" ▲";font-size:10px}
+thead th[aria-sort="descending"]::after{content:" ▼";font-size:10px}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+td .pn{font-weight:600} td .pt{color:var(--ink-3);font-size:12px;margin-left:6px}
+td.dim{color:var(--ink-3)}
+.dcell{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
+.dbar{width:64px;height:8px;position:relative;background:var(--surface-2);border-radius:4px}
+.dbar::before{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--ink-3)}
+.dbar i{position:absolute;top:0;bottom:0;border-radius:4px}
+.dval{font-weight:600;min-width:44px;display:inline-block}
+.cold-t{color:var(--cold)} .hot-t{color:var(--hot)}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,15,12,.45);z-index:20;display:flex;justify-content:flex-end}
+.drawer{background:var(--bg);width:min(560px,100%);height:100%;overflow-y:auto;padding:calc(20px + env(safe-area-inset-top,0px)) 20px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:20px;box-shadow:var(--shadow)}
+.d-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.d-top h2{font-size:34px;font-weight:800;text-transform:uppercase;line-height:1}
+.d-top .sub{color:var(--ink-2);font-size:14px;margin-top:4px}
+.close{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kpi .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);font-weight:600}
+.kpi .v{font-family:var(--display);font-size:28px;font-weight:800;line-height:1.1}
+.verdict{background:var(--surface);border-left:4px solid var(--ink-3);padding:10px 14px;border-radius:0 8px 8px 0;font-size:14px;color:var(--ink-2)}
+.verdict.cold{border-color:var(--cold)} .verdict.hot{border-color:var(--hot)}
+.d-sec h3{font-size:17px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+#wkchart{width:100%;height:auto;display:block;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+#wkchart text{fill:var(--ink-3);font-size:11px;font-family:var(--body)}
+.wk-tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.wk-tbl table{min-width:480px;font-size:13px}
+.wk-tbl td:first-child,.wk-tbl th:first-child{position:static}
+.wk-tbl thead th{cursor:default}
+.usage{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+
+/* notes */
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px 28px;font-size:14px;color:var(--ink-2);border-top:1px solid var(--line);padding-top:24px}
+.notes h3{font-size:16px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);margin-bottom:4px}
+.notes p{margin:0}
+
+/* view switch */
+.views{display:flex;gap:18px;border-bottom:1px solid var(--line)}
+.views button{border:0;background:none;padding:10px 2px;font-family:var(--display);font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
+.views button[aria-selected="true"]{color:var(--ink);border-color:var(--accent)}
+.views .new{font-family:var(--body);font-size:11px;font-weight:600;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:1px 7px;margin-left:6px;vertical-align:3px;letter-spacing:.02em}
+.view{display:flex;flex-direction:column;gap:36px}
+
+/* team + advisor */
+.team-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.panel h2{font-size:26px;font-weight:700;text-transform:uppercase}
+.row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.muted{color:var(--ink-3);font-size:13px}
+.league{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:13px;color:var(--ink-2);background:var(--surface-2);border-radius:8px;padding:10px 12px}
+.league label{display:inline-flex;align-items:center;gap:6px}
+.league select,.league input{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:3px 6px}
+.league input[type=number]{width:44px}
+.picker{position:relative}
+.picker input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit}
+.results{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);z-index:5;max-height:320px;overflow-y:auto;padding:4px}
+.results button{display:flex;width:100%;justify-content:space-between;gap:10px;border:0;background:none;padding:8px 10px;border-radius:7px;cursor:pointer;text-align:left;font-size:14px}
+.results button:hover,.results button.act{background:var(--surface-2)}
+.results .meta{color:var(--ink-3);font-size:12.5px;white-space:nowrap}
+.roster{display:flex;flex-direction:column;gap:14px}
+.rgroup h4{margin:0 0 6px;font-family:var(--display);font-size:14px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase}
+.rp{display:grid;grid-template-columns:1fr auto auto;gap:2px 10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin-bottom:6px}
+.rp .nm{font-weight:600;cursor:pointer;overflow-wrap:anywhere}
+.rp .nm:hover{text-decoration:underline}
+.rp .sub{grid-column:1/2;font-size:12.5px;color:var(--ink-2)}
+.rp .chip{grid-row:1/3;grid-column:2}
+.rp .x{grid-row:1/3;grid-column:3;border:0;background:none;color:var(--ink-3);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1}
+.rp .x:hover{color:var(--cold);background:var(--surface-2)}
+.chip{display:inline-block;font-weight:700;font-size:13px;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip.cold{background:var(--cold-soft);color:var(--cold)} .chip.hot{background:var(--hot-soft);color:var(--hot)}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;padding:1px 6px;border-radius:5px;background:var(--cold-soft);color:var(--cold);margin-left:4px}
+.tag.warn{background:var(--surface-2);color:var(--ink-2)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.modes{display:flex;flex-wrap:wrap;gap:4px;background:var(--surface-2);padding:4px;border-radius:9px}
+.modes button{border:0;background:none;padding:7px 12px;border-radius:6px;font-weight:600;font-size:14px;cursor:pointer;color:var(--ink-2)}
+.modes button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.mode{display:flex;flex-direction:column;gap:12px}
+.mode p{margin:0;color:var(--ink-2);font-size:14px}
+textarea{width:100%;min-height:70px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;resize:vertical}
+.sides{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.side{border:1px dashed var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.side h4{margin:0;font-family:var(--display);font-size:15px;letter-spacing:.08em;text-transform:uppercase}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border-radius:999px;padding:4px 6px 4px 10px;font-size:13px;font-weight:600}
+.pill button{border:0;background:none;cursor:pointer;color:var(--ink-3);font-size:15px;line-height:1;padding:0 4px}
+.side select{font:inherit;padding:7px 8px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);width:100%}
+.meter{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:13px;background:var(--surface-2);border-radius:9px;padding:10px 12px}
+.meter .bar{height:10px;border-radius:5px;background:var(--line);position:relative;overflow:hidden}
+.meter .bar i{position:absolute;top:0;bottom:0;left:0;background:var(--accent);border-radius:5px}
+.meter .lab{color:var(--ink-2)}
+.meter .verdict2{grid-column:1/-1;font-weight:600;font-size:14px}
+.cands{display:flex;flex-direction:column;gap:6px}
+.cand{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+.cand .nm{font-weight:600}
+.cand .why{grid-column:1/-1;font-size:12.5px;color:var(--ink-2)}
+.cand h5{margin:0}
+.subh{font-family:var(--display);font-size:16px;letter-spacing:.07em;text-transform:uppercase;margin:4px 0 0}
+.answer{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}
+.answer .head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.answer .head b{font-family:var(--display);font-size:18px;letter-spacing:.06em;text-transform:uppercase}
+.md{font-size:14.5px;line-height:1.6;max-width:70ch}
+.md h3,.md h4{font-family:var(--display);font-size:18px;text-transform:uppercase;letter-spacing:.05em;margin:14px 0 4px}
+.md p{margin:6px 0}
+.md ul,.md ol{margin:6px 0;padding-left:22px}
+.md li{margin:3px 0}
+.thinking{display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:14px}
+.dots{display:inline-flex;gap:4px}.dots i{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:bl 1.2s infinite ease-in-out}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.note{font-size:12.5px;color:var(--ink-3)}
+.err{color:var(--cold);font-size:14px}
+.save-state{font-size:12.5px;color:var(--ink-3)}
+.drawer .add{align-self:flex-start}
+
+/* league switcher */
+.lgbar{display:flex;flex-direction:column;gap:14px}
+.lg-groups{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-start}
+.lg-group{display:flex;flex-direction:column;gap:6px;min-width:0}
+.lg-group>span{font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.lg-btns{display:flex;flex-wrap:wrap;gap:6px}
+.lg-btn{display:flex;flex-direction:column;align-items:flex-start;gap:0;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:7px 12px;cursor:pointer;text-align:left;min-width:0}
+.lg-btn:hover{border-color:var(--ink-3)}
+.lg-btn b{font-weight:600;font-size:14.5px;line-height:1.25;overflow-wrap:anywhere}
+.lg-btn small{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.lg-btn[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.lg-btn[aria-pressed="true"] small{color:var(--ink-2)}
+.lg-info{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 20px;align-items:end;background:var(--surface-2);border-radius:10px;padding:12px 14px}
+.lg-info .spec{display:flex;flex-direction:column;gap:3px;font-size:13.5px;color:var(--ink-2);min-width:0}
+.lg-info .spec b{font-family:var(--display);font-size:22px;color:var(--ink);letter-spacing:.02em;line-height:1.1}
+.lg-type{display:inline-block;font-family:var(--body);font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--surface);color:var(--ink-2);vertical-align:4px;margin-left:6px}
+.lg-type.dyn{background:var(--accent);color:var(--accent-ink)}
+.teamsel{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.07em}
+.teamsel select{font:inherit;font-size:14px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%}
+.slot{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--ink-3);width:34px;flex:none}
+.rp.flat{grid-template-columns:auto 1fr auto}
+.rp.flat .nm{grid-column:2} .rp.flat .sub{grid-column:2} .rp.flat .slot{grid-row:1/3;grid-column:1} .rp.flat .chip{grid-column:3}
+.rp.nostat .nm{cursor:default} .rp.nostat .nm:hover{text-decoration:none}
+.viewing{font-size:13px;color:var(--ink-2);background:var(--surface-2);border-radius:8px;padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between}
+.own{font-size:12px;color:var(--ink-3);font-weight:500}
+@media (max-width:640px){.lg-info{grid-template-columns:1fr}}
+
+/* this week */
+.alerts{display:flex;flex-direction:column;gap:6px}
+.alert{display:grid;grid-template-columns:10px auto 1fr;gap:10px;align-items:baseline;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:14px}
+.alert i{width:8px;height:8px;border-radius:50%;background:var(--neutral-dot);align-self:center}
+.alert.high i{background:var(--cold)} .alert.med i{background:var(--accent)}
+.alert b{font-weight:600;font-size:12.5px;color:var(--ink-3);white-space:nowrap}
+.mu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.mu{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.mu h3{font-size:18px;text-transform:uppercase;letter-spacing:.04em;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.mu h3 small{font-family:var(--body);font-size:12px;text-transform:none;letter-spacing:0;color:var(--ink-3);font-weight:500}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.vs .side2{display:flex;flex-direction:column;gap:0;min-width:0}
+.vs .side2:last-child{text-align:right}
+.vs .side2 span{font-size:13px;color:var(--ink-2);overflow-wrap:anywhere}
+.vs .side2 b{font-family:var(--display);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+.vs .mid{font-family:var(--display);color:var(--ink-3);font-size:14px}
+.wp{height:10px;border-radius:5px;background:var(--cold-soft);overflow:hidden}
+.wp i{display:block;height:100%;background:var(--hot)}
+.mu .meta2{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--ink-2)}
+.mu details summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:600}
+.mu table{min-width:0;font-size:12.5px;margin-top:6px}
+.mu table td,.mu table th{padding:5px 6px}
+.mu table td:first-child,.mu table th:first-child{position:static}
+.mu table thead th{cursor:default;font-size:12px}
+.acc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.acc-grid .kpi .v{font-size:26px}
+.acc-grid .kpi .s{font-size:12.5px;color:var(--ink-2)}
+table.cal{min-width:420px}
+table.cal td,table.cal th{text-align:right} table.cal td:first-child,table.cal th:first-child{text-align:left;position:static}
+table.cal thead th{cursor:default}
+.lgchips{display:flex;flex-wrap:wrap;gap:4px;grid-column:1/-1}
+.lgchip{font-size:11.5px;font-weight:600;padding:1px 7px;border-radius:999px;background:var(--hot-soft);color:var(--hot)}
+
+/* projections, matchups, partners */
+.grade{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font-family:var(--display);font-weight:800;font-size:14px;background:var(--surface-2);color:var(--ink-2);flex:none}
+.grade.g-A,.grade.g-B{background:var(--hot-soft);color:var(--hot)} .grade.g-D,.grade.g-F{background:var(--cold-soft);color:var(--cold)}
+.proj{font-family:var(--display);font-weight:800;font-size:19px;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
+.proj small{display:block;font-family:var(--body);font-weight:500;font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+.rp.flat.pj{grid-template-columns:auto 1fr auto auto}
+.rp.flat.pj .chip{grid-column:4;grid-row:1/3} .rp.flat.pj .proj{grid-column:3;grid-row:1/3}
+.strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:4px}
+.strip div{background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:5px 4px;text-align:center;font-size:11.5px;color:var(--ink-2);line-height:1.25}
+.strip div b{display:block;font-family:var(--display);font-size:15px;color:var(--ink)}
+.strip div.po{border-color:var(--accent)}
+.strip div.g-A,.strip div.g-B{background:var(--hot-soft)} .strip div.g-D,.strip div.g-F{background:var(--cold-soft)}
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.facts .kpi .v{font-size:20px}
+.whys{margin:0;padding-left:18px;font-size:14px;color:var(--ink-2)}
+.sugg{display:flex;flex-direction:column;gap:4px;background:var(--surface-2);border-radius:9px;padding:10px 12px;font-size:13.5px}
+.sugg .ln{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center}
+.sugg .swap{color:var(--hot);font-weight:600}
+.partners{display:flex;flex-direction:column;gap:14px}
+table.needs{min-width:560px}
+table.needs td,table.needs th{text-align:center}
+table.needs td:first-child,table.needs th:first-child{text-align:left}
+table.needs thead th{cursor:default}
+table.needs tr.me td{background:var(--surface-2)}
+.need{display:inline-block;min-width:64px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-2)}
+.need.lo{background:var(--cold-soft);color:var(--cold)} .need.hi{background:var(--hot-soft);color:var(--hot)}
+.offers{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.offer{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.offer h4{margin:0;font-family:var(--display);font-size:18px;letter-spacing:.04em;text-transform:uppercase}
+.offer .sw{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:14px}
+.offer .sw span:nth-child(odd){font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);padding-top:2px}
+.offer .nums{display:flex;flex-wrap:wrap;gap:6px}
+.offer .why{font-size:12.5px;color:var(--ink-2);margin:0}
+
+@media (max-width:980px){.team-grid{grid-template-columns:1fr}}
+@media (max-width:520px){.sides{grid-template-columns:1fr}}
+@media (max-width:820px){.moves{grid-template-columns:1fr}}
+@media (max-width:460px){.cards{grid-template-columns:1fr}.tabs{width:100%}.tabs button{flex:1;padding:8px 0}.status{align-items:flex-start;text-align:left}.kpis{grid-template-columns:repeat(3,1fr)}.kpi .v{font-size:22px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* website: user bar and no-AI mode */
+.userbar{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.userbar label{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.userbar input{flex:1 1 180px;max-width:260px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+.userbar .who{font-weight:600}
+#boot{font-size:13px;color:var(--ink-2)} #boot.err{color:var(--cold)}
+.no-ai [data-mode="ask"],.no-ai #start-go,.no-ai #start-note,.no-ai #trade-go,.no-ai #deal-go,.no-ai [data-askoffer],.no-ai [data-pitch],.no-ai .views .new,.no-ai #answer,.no-ai #ai-foot{display:none!important}
+.loading-veil{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:50;font-family:var(--display);font-size:22px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div>
+        <h1>Luck <span>Lab</span></h1>
+        <p class="lede">Every player's actual PPR points next to what an average player would have scored with the same carries, targets and field position. Big gaps usually shrink over time.</p>
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+    <form class="userbar" id="userbar" autocomplete="on">
+      <label for="sl-user">Sleeper username</label>
+      <input id="sl-user" name="username" placeholder="e.g. ragbir" autocapitalize="off" spellcheck="false">
+      <button class="btn primary" type="submit">Load my leagues</button>
+      <span id="boot"></span>
+    </form>
+    <nav class="views" role="tablist" aria-label="Section" id="views">
+      <button role="tab" id="v-board" data-view="board" aria-selected="true">Luck board</button>
+      <button role="tab" id="v-week" data-view="week" aria-selected="false">This week</button>
+      <button role="tab" id="v-team" data-view="team" aria-selected="false">My leagues<span class="new">AI</span></button>
+    </nav>
+  </header>
+
+  <div class="view" id="view-board">
+    <div class="tabs" role="tablist" aria-label="Position" id="tabs">
+      <button role="tab" id="tab-QB" data-pos="QB">QB</button>
+      <button role="tab" id="tab-RB" data-pos="RB">RB</button>
+      <button role="tab" id="tab-WR" data-pos="WR">WR</button>
+      <button role="tab" id="tab-TE" data-pos="TE">TE</button>
+    </div>
+
+  <section aria-labelledby="moves-h">
+    <div class="sec-head">
+      <h2 id="moves-h">Trade targets</h2>
+      <p>Based on players with a real role (2+ games and meaningful expected points). Tap a player for his game log.</p>
+    </div>
+    <div class="moves">
+      <div class="col">
+        <h3><i style="background:var(--cold)"></i>Buy low</h3>
+        <p class="why">Busy roles, scoring well below what that usage usually produces.</p>
+        <div class="cards" id="buy"></div>
+      </div>
+      <div class="col">
+        <h3><i style="background:var(--hot)"></i>Sell high</h3>
+        <p class="why">Scoring well above what their usage predicts. Expect some cooling off.</p>
+        <div class="cards" id="sell"></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="chart-h">
+    <div class="sec-head">
+      <h2 id="chart-h">Actual vs expected</h2>
+      <p>Points per game. Players above the dashed line are beating their opportunity; players below it are falling short.</p>
+    </div>
+    <div class="chart-box" id="chart-box">
+      <svg id="scatter" role="img" aria-label="Scatter chart of actual versus expected PPR points per game"></svg>
+      <div class="tip" id="tip" hidden></div>
+      <div class="legend">
+        <span><i style="background:var(--cold)"></i>Below expected (unlucky)</span>
+        <span><i style="background:var(--hot)"></i>Above expected (lucky)</span>
+        <span><i style="background:var(--neutral-dot)"></i>Within 1 point</span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="board-h">
+    <div class="sec-head">
+      <h2 id="board-h">Leaderboard</h2>
+      <p>Sorted most unlucky first. Click any column to re-sort.</p>
+    </div>
+    <div class="controls">
+      <input class="search" id="search" type="search" placeholder="Search player or team" aria-label="Search player or team">
+      <label class="toggle"><input type="checkbox" id="qonly" checked> Real roles only</label>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="tbl-wrap"><table id="board"><thead></thead><tbody></tbody></table></div>
+  </section>
+  </div>
+
+  <div class="view" id="view-week" hidden>
+    <section aria-labelledby="al-h">
+      <div class="sec-head"><h2 id="al-h">Needs your attention</h2><p id="al-sub">Lineup problems, waiver targets and breakouts across all your leagues.</p></div>
+      <div class="alerts" id="alerts"></div>
+    </section>
+    <section aria-labelledby="mu-h">
+      <div class="sec-head"><h2 id="mu-h">Matchups</h2><p>Your Sleeper lineup vs this week's opponent. Win chance uses each player's projection and a realistic spread of outcomes; finished games count their real points.</p></div>
+      <div class="mu-grid" id="mu-grid"></div>
+    </section>
+    <section aria-labelledby="wv-h">
+      <div class="sec-head"><h2 id="wv-h">Waiver wire</h2><p>Best adds for your roster in each league, with who to drop. FAAB bids get bolder when you're losing and more careful when you're winning.</p></div>
+      <div class="mu-grid" id="wv-grid"></div>
+    </section>
+    <section aria-labelledby="bo-h">
+      <div class="sec-head"><h2 id="bo-h">Breakouts</h2><p>Players whose role jumped in their latest game, or who are next in line behind an injured starter. Chips show where they're free agents.</p></div>
+      <div class="cands" id="bo-list"></div>
+    </section>
+    <section aria-labelledby="ac-h">
+      <div class="sec-head"><h2 id="ac-h">How accurate is this?</h2><p>The projection model tested on the full 2025 season, each week using only the data available before it. Live results for 2026 fill in as games are played.</p></div>
+      <div id="acc"></div>
+    </section>
+  </div>
+
+  <div class="view" id="view-team" hidden>
+    <section class="lgbar" aria-labelledby="lgbar-h">
+      <div class="sec-head" style="margin-bottom:0"><h2 id="lgbar-h">My leagues</h2><p id="lg-src"></p></div>
+      <div class="lg-groups" id="lg-groups"></div>
+      <div class="lg-info" id="lg-info"></div>
+    </section>
+    <div class="team-grid">
+      <section class="panel" aria-labelledby="team-h">
+        <div class="row" style="justify-content:space-between"><h2 id="team-h">My team</h2><span class="save-state" id="save-state"></span></div>
+        <div class="league" id="league">
+          <label>Teams <select id="lg-teams"><option>8</option><option>10</option><option selected>12</option><option>14</option><option>16</option></select></label>
+          <label>QB <input type="number" id="lg-QB" min="0" max="3" value="1"></label>
+          <label>RB <input type="number" id="lg-RB" min="0" max="4" value="2"></label>
+          <label>WR <input type="number" id="lg-WR" min="0" max="5" value="2"></label>
+          <label>TE <input type="number" id="lg-TE" min="0" max="3" value="1"></label>
+          <label>FLEX <input type="number" id="lg-FLEX" min="0" max="4" value="1"></label>
+          <label><input type="checkbox" id="lg-SF"> Superflex</label>
+        </div>
+        <div class="picker" id="add-picker">
+          <input id="add-search" type="search" placeholder="Add a player to your team" autocomplete="off" aria-label="Add a player to your team">
+          <div class="results" id="add-results" hidden></div>
+        </div>
+        <div class="roster" id="roster"></div>
+        <div id="fa-box" hidden>
+          <h3 class="subh" style="margin-bottom:6px">Best free agents</h3>
+          <p class="note" style="margin:0 0 8px">Unrostered in this league, ranked by projected points for the rest of the season.</p>
+          <div class="modes" role="tablist" aria-label="Free agent position" id="fa-pos" style="margin-bottom:8px">
+            <button role="tab" data-p="ALL" aria-selected="true">All</button><button role="tab" data-p="QB" aria-selected="false">QB</button><button role="tab" data-p="RB" aria-selected="false">RB</button><button role="tab" data-p="WR" aria-selected="false">WR</button><button role="tab" data-p="TE" aria-selected="false">TE</button>
+          </div>
+          <div class="cands" id="fa-list"></div>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="adv-h">
+        <h2 id="adv-h">Advisor</h2>
+        <div class="modes" role="tablist" aria-label="Advisor mode" id="modes">
+          <button role="tab" data-mode="start" aria-selected="true">Start / sit</button>
+          <button role="tab" data-mode="trade" aria-selected="false">Trade check</button>
+          <button role="tab" data-mode="deal" aria-selected="false">Find a deal</button>
+          <button role="tab" data-mode="ask" aria-selected="false">Ask anything</button>
+        </div>
+
+        <div class="mode" id="mode-start">
+          <p id="start-intro">Claude sets your best lineup using expected points, luck, this week's matchup, Vegas team totals and the injury report.</p>
+          <div id="lineup-sugg"></div>
+          <textarea id="start-note" placeholder="Optional: anything to weigh, e.g. &quot;I'm deciding between my WR3 and my flex RB.&quot;"></textarea>
+          <div class="row"><button class="btn primary" id="start-go">Set my lineup</button></div>
+        </div>
+
+        <div class="mode" id="mode-trade" hidden>
+          <div class="modes" role="tablist" aria-label="Trade type" id="trade-kind" style="align-self:flex-start">
+            <button role="tab" data-k="mine" aria-selected="true">My trade</button>
+            <button role="tab" data-k="any" aria-selected="false">Any two teams</button>
+          </div>
+          <p id="trade-intro">Build the trade, see the value math instantly, then ask Claude for a verdict and a counteroffer. Either side can include any player.</p>
+          <div class="sides">
+            <div class="side"><h4 id="give-h">You give</h4><select id="give-sel" aria-label="Add a player from your team"><option value="">Add from your team…</option></select><div class="picker"><input id="give-search" type="search" placeholder="Search any player" autocomplete="off" aria-label="Add a player to the first side"><div class="results" id="give-results" hidden></div></div><div class="pills" id="give-pills"></div></div>
+            <div class="side"><h4 id="get-h">You get</h4><div class="picker"><input id="get-search" type="search" placeholder="Search any player" autocomplete="off" aria-label="Add a player to the second side"><div class="results" id="get-results" hidden></div></div><div class="pills" id="get-pills"></div></div>
+          </div>
+          <div id="trade-meter"></div>
+          <div class="row"><button class="btn primary" id="trade-go" disabled>Evaluate this trade</button></div>
+        </div>
+
+        <div class="mode" id="mode-deal" hidden>
+          <p>Pick one player or stack several. Your own players: see fair returns from every team that don't sell below trade market value. Players from one other team: see packages from your roster their manager should accept without you overpaying. Mix yours and theirs to build a deal, and it tells you what to add to make it fair.</p>
+          <div class="picker"><input id="deal-search" type="search" placeholder="Pick a player (add more to stack a deal)" autocomplete="off" aria-label="Pick a player"><div class="results" id="deal-results" hidden></div></div>
+          <div class="pills" id="deal-pills"></div>
+          <div id="deal-out"></div>
+          <div class="row"><button class="btn primary" id="deal-go" disabled>Ask Claude to build offers</button></div>
+        </div>
+
+        <div class="mode" id="mode-ask" hidden>
+          <p>Ask about your team, a player, waivers or anything else. Claude sees your roster, your league settings and every player's numbers on this site.</p>
+          <textarea id="ask-q" placeholder="e.g. Which of my players are most likely to break out over the next month?"></textarea>
+          <div class="row"><button class="btn primary" id="ask-go">Ask Claude</button></div>
+        </div>
+
+        <div class="answer" id="answer" hidden>
+          <div class="head"><b id="answer-title">Advice</b><button class="btn" id="stop" hidden>Stop</button></div>
+          <div id="answer-body"></div>
+          <div class="note" id="answer-note"></div>
+        </div>
+        <p class="note" id="ai-foot">Answers come from Claude on your own Claude account and use only the numbers on this site. They're advice, not guarantees.</p>
+      </section>
+    </div>
+
+    <section class="partners" id="partners" aria-labelledby="tp-h" hidden>
+      <div class="sec-head" style="margin-bottom:0"><h2 id="tp-h">Trade partners</h2><p id="tp-sub">Every roster in this league, graded by position. Offers pair your surplus with their holes and are built to look fair or better to them.</p></div>
+      <div class="tbl-wrap"><table class="needs" id="needs-tbl"></table></div>
+      <div class="offers" id="offers"></div>
+    </section>
+  </div>
+
+  <section class="notes" aria-label="How it works">
+    <div><h3>Projections</h3><p>Each player's usage-based points per game (70% expected, 30% actual, with last season as a small prior), adjusted for every game left: the team's Vegas total, the opponent's run defense on the kind of runs he makes (inside vs outside gaps), its pass defense, deep defense, points allowed to his position, and for receivers how he has done against man vs zone coverage. Scored with each league's own settings.</p></div>
+    <div><h3>Trade value</h3><p>Rest-of-season points above a replacement starter in your league, with playoff weeks counted 1.5 times. Dynasty adds the next three seasons, adjusted for age and position, and values draft picks against players. Both are anchored to the trade market: crowd-sourced values from thousands of real fantasy trades (FantasyCalc) plus where the player went in your league's own draft, which fades as the season goes on. "How they see it" leans mostly on that market, with points scored so far on top.</p></div>
+    <div><h3>Run style</h3><p>Inside runs are runs up the middle or through the guard gaps; outside runs go through the tackle or end. Free data doesn't label zone or gap blocking schemes, so direction is the stand-in. Coverage tendencies come from last season's charting.</p></div>
+    <div><h3>Expected points</h3><p>From nflverse's open expected-points model. It grades every carry, target and pass attempt by field position, down, distance and air yards, then adds up what an average player scores on those plays.</p></div>
+    <div><h3>Scoring</h3><p>The luck board uses full PPR: 1 per catch, 0.1 per rushing or receiving yard, 0.04 per passing yard, 6 per rushing or receiving TD, 4 per passing TD, −2 per interception or lost fumble. Projections and trade values use each league's own scoring.</p></div>
+    <div><h3>Usage</h3><p>Snap % is the share of team offensive plays he was on the field for. Target share is his targets divided by team targets. RZ touches are carries and catches inside the 20. GL carries are carries inside the 5.</p></div>
+    <div><h3>Refresh</h3><p>Player data comes from nflverse and rebuilds automatically every morning, plus a Sunday pre-kickoff update. Your Sleeper leagues load live every time you open the page. Small samples swing wildly early in the season, so trust the numbers more as the weeks pile up.</p></div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden>
+  <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="d-name" id="drawer"></aside>
+</div>
+
+
+<div class="loading-veil" id="veil">Loading Luck Lab…</div>
+<script src="league.js"></script>
+<script>
+(async function boot(){
+  const $=s=>document.querySelector(s), bootEl=$('#boot'), inp=$('#sl-user');
+  let u=new URLSearchParams(location.search).get('u');
+  try{ if(u) localStorage.setItem('ll-user',u); else u=localStorage.getItem('ll-user'); }catch(e){}
+  if(u) inp.value=u;
+  $('#userbar').addEventListener('submit',e=>{ e.preventDefault(); const v=inp.value.trim(); if(!v) return; try{ localStorage.setItem('ll-user',v); }catch(_){} if(location.search) location.href=location.pathname+location.hash; else location.reload(); });
+  const put=(id,obj)=>{ const s=document.createElement('script'); s.type='application/json'; s.id=id; s.textContent=JSON.stringify(obj); document.body.appendChild(s); };
+  let core;
+  try{ core=await fetch('data/core.json',{cache:'no-cache'}).then(r=>r.json()); }
+  catch(e){ $('#veil').textContent='Could not load player data. Refresh the page to try again.'; return; }
+  $('#veil').remove();
+  let SL=null;
+  if(u){ bootEl.textContent='Loading your Sleeper leagues…';
+    try{ SL=await buildSleeper(u,core,m=>bootEl.textContent=m); bootEl.className=''; bootEl.innerHTML=`Showing <span class="who">${u.replace(/[<>&"]/g,'')}</span>: ${SL.leagues.length} league${SL.leagues.length===1?'':'s'}. Data updated ${new Date(core.generated.replace('Z',':00Z')).toLocaleString(undefined,{weekday:'short',hour:'numeric',minute:'2-digit'})}.`; }
+    catch(e){ bootEl.className='err'; bootEl.textContent=e.message; } }
+  else { bootEl.textContent='Enter your Sleeper username to load your leagues. The luck board works without it.'; }
+  put('site-data',core.site); put('matchup-data',core.mx); put('sleeper-data',SL||{leagues:[],players:{},breakouts:core.brk}); put('history-data',core.hist);
+  if(!window.claude) document.body.classList.add('no-ai');
+  const app=document.createElement('script'); app.src='app.js?v='+encodeURIComponent(core.generated); document.body.appendChild(app);
+})();
+</script>
+</body>
+</html>

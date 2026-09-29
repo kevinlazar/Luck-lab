@@ -1,0 +1,6 @@
+nflreadpy
+polars
+pyarrow
+pandas
+numpy
+requests
